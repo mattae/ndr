@@ -1,0 +1,55 @@
+<mat-card>
+    <mat-card-content>
+        <mat-tab-group (selectedTabChange)="tabChanged($event)">
+            <mat-tab label="Conversion">
+                <ng-container *ngIf="running">
+                    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                    <mat-form-field style="width: 100%">
+                        <input [disabled]="true" matInput [value]="message"/>
+                    </mat-form-field>
+                </ng-container>
+                <ng-container *ngIf="finished">
+                    <mat-form-field style="width: 100%">
+                        <input [disabled]="true" matInput [value]="message"/>
+                    </mat-form-field>
+                </ng-container>
+                <mat-list>
+                    <div mat-subheader>Available Facilities</div>
+                    <mat-list-item *ngFor="let facility of facilities">
+                        <mat-icon mat-list-icon>account_balance</mat-icon>
+                        <div mat-line>
+                            <mat-checkbox
+                                    [(ngModel)]="facility.selected"
+                                    labelPosition="before">
+                                {{facility.name}}
+                            </mat-checkbox>
+                        </div>
+                    </mat-list-item>
+                    <mat-divider></mat-divider>
+                    <button mat-button
+                            (click)="deduplicate()"
+                            [disabled]="running">Remove Duplicate Records
+                    </button>
+                    <button mat-raised-button color="primary"
+                            (click)="convert()"
+                            [disabled]="running || !selected()">Generate NDR
+                    </button>
+                </mat-list>
+            </mat-tab>
+            <mat-tab label="Download">
+                <mat-list>
+                    <div mat-subheader>Available NDR Files</div>
+                    <mat-list-item *ngFor="let file of files">
+                        <div mat-line>
+                            {{file}}
+                            <button mat-list-icon
+                                    (click)="download(file)">
+                                <mat-icon>file_download</mat-icon>
+                            </button>
+                        </div>
+                    </mat-list-item>
+                </mat-list>
+            </mat-tab>
+        </mat-tab-group>
+    </mat-card-content>
+</mat-card>
