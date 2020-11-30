@@ -52,6 +52,7 @@ public class NdrConverterService {
     private final CommonQuestionsTypeMapper commonQuestionsTypeMapper;
     private final PatientDemographicsMapper patientDemographicsMapper;
     private final LaboratoryReportTypeMapper laboratoryReportTypeMapper;
+    private final MessageHeaderTypeMapper messageHeaderTypeMapper;
     private final EncountersTypeMapper encountersTypeMapper;
     private final CodeSetResolver codeSetResolver;
     private final SimpMessageSendingOperations messagingTemplate;
@@ -127,7 +128,7 @@ public class NdrConverterService {
             Container container = new Container();
 
             //Set the Header Information
-            MessageHeaderType header = MessageHeaderTypeMapper.messageHeaderType(patientId);
+            MessageHeaderType header = messageHeaderTypeMapper.messageHeaderType(patientId);
             header.setMessageStatusCode(statusCode);
             header.setMessageUniqueID(Long.toString(messageId.incrementAndGet()));
 

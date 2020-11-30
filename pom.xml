@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.fhi360.lamis.modules</groupId>
     <artifactId>ndr</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
     <name>LAMIS NDR Module</name>
 
     <properties>
@@ -31,8 +31,8 @@
     <dependencies>
         <dependency>
             <groupId>org.lamisplus.modules</groupId>
-            <artifactId>lamis-base</artifactId>
-            <version>1.0.1</version>
+            <artifactId>lamis-legacy</artifactId>
+            <version>1.3.0</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

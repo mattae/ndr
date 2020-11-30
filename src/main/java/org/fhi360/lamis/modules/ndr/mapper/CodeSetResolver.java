@@ -50,26 +50,22 @@ public class CodeSetResolver {
         final CodedSimpleType cst = new CodedSimpleType();
         String query1 = "SELECT composition, regimen_type_id FROM regimen WHERE id = ?";
         jdbcTemplate.query(query1, rs -> {
-            if (rs.next()) {
-                String regimenTypeId = Long.toString(rs.getLong("regimen_type_id"));
-                String regimen = StringUtils.trimToEmpty(rs.getString("composition")) + "_" + regimenTypeId;
-                String query2 = "SELECT * FROM ndr_code_set WHERE sys_description = ?";
-                jdbcTemplate.query(query2, rs1 -> {
-                    if (rs1.next()) {
-                        cst.setCode(rs1.getString("code"));
-                        cst.setCodeDescTxt(rs1.getString("code_description"));
-                    } else {
-                        String regimen2 = "Others_" + regimenTypeId;
-                        String query3 = "SELECT * FROM ndr_code_set WHERE sys_description = ?";
-                        jdbcTemplate.query(query3, rs2 -> {
-                            cst.setCode(rs2.getString("code"));
-                            cst.setCodeDescTxt(rs2.getString("code_description"));
-                        }, regimen2);
-                    }
-                    return null;
-                }, regimen);
+            String regimenTypeId = Long.toString(rs.getLong("regimen_type_id"));
+            String regimen = StringUtils.trimToEmpty(rs.getString("composition")) + "_" + regimenTypeId;
+            String query2 = "SELECT * FROM ndr_code_set WHERE sys_description = ?";
+            jdbcTemplate.query(query2, rs1 -> {
+                cst.setCode(rs1.getString("code"));
+                cst.setCodeDescTxt(rs1.getString("code_description"));
+            }, regimen);
+
+            if (cst.getCode() == null) {
+                String regimen2 = "Others_" + regimenTypeId;
+                String query3 = "SELECT * FROM ndr_code_set WHERE sys_description = ?";
+                jdbcTemplate.query(query3, rs2 -> {
+                    cst.setCode(rs2.getString("code"));
+                    cst.setCodeDescTxt(rs2.getString("code_description"));
+                }, regimen2);
             }
-            return null;
         }, regimenId);
         return cst;
     }

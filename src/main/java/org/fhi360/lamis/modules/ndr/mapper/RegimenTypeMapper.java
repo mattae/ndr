@@ -28,12 +28,12 @@ public class RegimenTypeMapper {
 
         //The query is sorted by date of visit and then by regimen id, beacuse we need to know when a regimen changes chronologically
         String query = "SELECT DISTINCT p.id, p.uuid, date_visit, (jsonb_extract_path_text(l,'regimen_id'))::int regimen_id, " +
-                "t.id regimen_type_id, (jsonb_extract_path_text(l,'duration'))::int duration, t.description " +
+                "t.id regimen_type_id, (jsonb_extract_path_text(l,'duration'))::int duration, r.description regimen_desc, t.description " +
                 "FROM pharmacy p, jsonb_array_elements(lines) with ordinality a(l) JOIN regimen_type t ON " +
-                "(jsonb_extract_path_text(l,'regimen_type_id'))::int = t.id " +
-                "WHERE (jsonb_extract_path_text(l,'regimen_type_id'))::int IN (1, 2, 3, 4, 14, 5, 6, 7, 8, 9, 10, 11, 12) " +
-                "AND (jsonb_extract_path_text(l,'duration'))::int > 0.0 AND p.patient_id = ? " +
-                "AND date_visit BETWEEN '1901-01-01' AND CURRENT_DATE AND p.archived = FALSE ORDER BY " +
+                "(jsonb_extract_path_text(l,'regimen_type_id'))::int = t.id JOIN regimen r ON " +
+                "(jsonb_extract_path_text(l,'regimen_id'))::int = r.id WHERE (jsonb_extract_path_text(l,'regimen_type_id'))::int " +
+                "IN (1, 2, 3, 4, 14, 5, 6, 7, 8, 9, 10, 11, 12) AND (jsonb_extract_path_text(l,'duration'))::int > 0.0 " +
+                "AND p.patient_id = ? AND date_visit BETWEEN '1901-01-01' AND CURRENT_DATE AND p.archived = FALSE ORDER BY " +
                 "date_visit, (jsonb_extract_path_text(l,'regimen_id'))::int";
         jdbcTemplate.query(query, rs -> {
             RegimenType regimenType = null;
@@ -74,8 +74,11 @@ public class RegimenTypeMapper {
                         e.printStackTrace();
                     }
                 }
-
+                String regimen = rs.getString("regimen_desc");
                 CodedSimpleType cst = codeSetResolver.getRegimenById(rs.getLong("regimen_id"));
+                if (cst.getCode() == null) {
+                    codeSetResolver.getCodedSimpleType("OI_REGIMEN", regimen);
+                }
                 if (cst.getCode() != null && regimenType != null) {
                     regimenType.setPrescribedRegimen(cst);
                     try {
@@ -94,7 +97,7 @@ public class RegimenTypeMapper {
                     } else if (description.contains("ARV")) {
                         description = "PMTCT";
                     } else if (description.contains("CTX")) {
-                        description = "CTX";
+                        description = "OI";
                     }
                     long regimenTypeId = rs.getLong("regimen_type_id");
                     if (Arrays.asList(1L, 2L, 3L, 4L, 14L).contains(regimenTypeId)) {

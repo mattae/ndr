@@ -1,15 +1,23 @@
 package org.fhi360.lamis.modules.ndr.mapper;
 
 
+import lombok.RequiredArgsConstructor;
 import org.fhi360.lamis.modules.ndr.schema.FacilityType;
 import org.fhi360.lamis.modules.ndr.schema.MessageHeaderType;
 import org.fhi360.lamis.modules.ndr.util.DateUtil;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
+@Component
+@RequiredArgsConstructor
 public class MessageHeaderTypeMapper {
-    public static MessageHeaderType messageHeaderType(long patientId) {
+    private final TreatmentFacility treatmentFacility;
+    private final JdbcTemplate jdbcTemplate;
+
+    public MessageHeaderType messageHeaderType(long patientId) {
         MessageHeaderType header = new MessageHeaderType();
         try {
             //Set the Header Information
@@ -18,10 +26,10 @@ public class MessageHeaderTypeMapper {
 
             //Set the Sending Organization in the Header
             //In this scenario we are using a fictional IP
-            FacilityType sendingOrganization = new FacilityType();
-            sendingOrganization.setFacilityName("Family Health International");
-            sendingOrganization.setFacilityID("FHI360");
-            sendingOrganization.setFacilityTypeCode("IP");
+            long facilityId = jdbcTemplate.queryForObject("select facility_id from patient where id = ?", Long.class,
+                    patientId);
+
+            FacilityType sendingOrganization = treatmentFacility.getFacility(facilityId);
             header.setMessageSendingOrganization(sendingOrganization);
         } catch (Exception exception) {
             exception.printStackTrace();

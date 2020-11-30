@@ -81,10 +81,10 @@
                   tableName="ndr_code_set"/>
     </changeSet>
 
-    <changeSet id="202010128092745-01" author="mattae">
+    <changeSet id="202010128092745-01-fix" author="mattae">
         <sql>
-            truncate ndr_code_set set code = '1a' where code = '4a';
-            truncate ndr_code_set set code = '1b' where code = '4b';
+            update ndr_code_set set code = '1a' where code = '4a';
+            update ndr_code_set set code = '1b' where code = '4b';
         </sql>
     </changeSet>
 </databaseChangeLog>

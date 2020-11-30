@@ -16,7 +16,7 @@ public class PregnancyStatus {
 
         String query = "SELECT date_visit, pregnant, lmp, (lmp + INTERVAL '280 DAY') AS edd FROM clinic " +
                 "WHERE patient_id = ? AND date_visit >= (CURRENT_DATE + INTERVAL '-9 MONTH') AND date_visit <= CURRENT_DATE " +
-                "and 1=1";
+                "and archived = false";
 
         Map<String, Object> map = new HashMap<>();
         map.put("status", "NK");   //If no clinic record is found the pregnancy status is Unknown
